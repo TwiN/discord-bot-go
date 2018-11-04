@@ -32,7 +32,7 @@ func connect() *discordgo.Session {
 	fmt.Println("[connect] Connecting to Discord...")
 	err = bot.Open()
 	if err != nil {
-		log.Printf("Failed connecting to Discord: %s\n", err)
+		log.Printf("Failed to establish connection with Discord: %s\n", err)
 		os.Exit(1)
 	}
 	fmt.Println("[connect] Connected to Discord successfully!")
