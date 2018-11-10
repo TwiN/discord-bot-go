@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"reflect"
+	"runtime"
 
 	"github.com/bwmarrin/discordgo"
 	Handler "./handler"
@@ -30,25 +32,39 @@ func main() {
 func connect() *discordgo.Session {
 	var bot, err = discordgo.New("Bot " + TOKEN)
 
-	fmt.Println("[connect] Connecting to Discord...")
+	log.Println("[connect] Connecting to Discord...")
 	err = bot.Open()
 	if err != nil {
 		log.Printf("[connect] Failed to establish connection with Discord: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("[connect] Connected to Discord successfully!")
+	log.Println("[connect] Connected to Discord successfully!")
 
 	return bot
 }
 
 
+var registeredHandlers []interface{}
+
+func init() {
+	registeredHandlers = append(registeredHandlers, 
+		Handler.ShortcutConverterHandler, 
+		Handler.SayHandler, 
+		Handler.GoogleSearchHandler, 
+		Handler.YoutubeSearchHandler, 
+		Handler.PingPongHandler,
+		loggerHandler,
+	)
+}
+
+
 func registerHandlers(bot *discordgo.Session) {
-	bot.AddHandler(Handler.ShortcutConverterHandler)
-	bot.AddHandler(Handler.SayHandler)
-	bot.AddHandler(Handler.GoogleSearchHandler)
-	bot.AddHandler(Handler.YoutubeSearchHandler)
-	bot.AddHandler(Handler.PingPongHandler)
-	bot.AddHandler(loggerHandler)
+	bot.UpdateStatus(1, "Registering handlers")
+	for _, handler := range registeredHandlers {
+		log.Println("[registerHandlers] Registering " + runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name())
+		bot.AddHandler(handler)
+	}
+	bot.UpdateStatus(0, "")
 }
 
 
