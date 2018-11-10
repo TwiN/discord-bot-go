@@ -21,13 +21,6 @@ func BasicHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			case "say": say(b, m, query); break
 			case "purge": purge(b, m, query); break
 		}
-
-		/*if len(query) == 0 {
-			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
-		} else {
-
-		}*/
-
 	}
 }
 
