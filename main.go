@@ -50,7 +50,8 @@ func init() {
 		Handler.ShortcutConverterHandler, 
 		Handler.SayHandler, 
 		Handler.GoogleSearchHandler, 
-		Handler.YoutubeSearchHandler, 
+		Handler.YoutubeSearchHandler,
+		Handler.UrbanDictionarySearchHandler,
 		Handler.PingPongHandler,
 		loggerHandler,
 	)
@@ -68,5 +69,5 @@ func registerHandlers(bot *discordgo.Session) {
 
 
 func loggerHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
-	log.Println("[", message.Author.Username, "]", message.ContentWithMentionsReplaced())
+	log.Println(message.Author.Username, "-", message.ContentWithMentionsReplaced())
 }
