@@ -24,7 +24,7 @@ func googleRequest(searchURL string) (*http.Response, error) {
 }
 
 func googleResultParser(response *http.Response) []string {
-	doc, err := goquery.NewDocumentFromResponse(response)
+	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		return nil
 	}
