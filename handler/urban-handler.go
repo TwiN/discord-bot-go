@@ -7,6 +7,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	Constants "../global"
+	Cache "../cache"
 )
 
 
@@ -17,11 +18,18 @@ func UrbanDictionarySearchHandler(bot *discordgo.Session, message *discordgo.Mes
 	}
 	if strings.HasPrefix(message.Content, COMMAND) {
 		var query = strings.Trim(strings.Replace(message.Content, COMMAND, "", 1), " ")
+		if Cache.Has("urban", query) {
+			for _, url := range Cache.Get("urban", query) {
+				bot.ChannelMessageSend(message.ChannelID, "[cached] " + url)
+			}
+			return
+		}
 		if len(query) == 0 {
 			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
 		} else {
 			bot.UpdateStatus(1, "| :mag_right: '" + query + "' on UrbanDictionary")
 			result := "**Urban Dictionary search result for `" + query + "`:**" + UrbanDictionarySearchScraper(query)
+			Cache.Put("urban", query, []string{result})
 			bot.ChannelMessageSend(message.ChannelID, result)
 			bot.UpdateStatus(0, "")
 		}

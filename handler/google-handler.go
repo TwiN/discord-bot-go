@@ -7,6 +7,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	Constants "../global"
+	Cache "../cache"
 )
 
 
@@ -17,11 +18,18 @@ func GoogleSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreat
 	}
 	if strings.HasPrefix(message.Content, COMMAND) {
 		var query = strings.Trim(strings.Replace(message.Content, COMMAND, "", 1), " ")
+		if Cache.Has("google", query) {
+			for _, url := range Cache.Get("google", query) {
+				bot.ChannelMessageSend(message.ChannelID, "[cached] " + url)
+			}
+			return
+		}
 		if len(query) == 0 {
 			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
 		} else {
 			bot.UpdateStatus(1, "| :mag_right: '" + query + "' on Google")
-			var results= GoogleSearchScraper(query)
+			var results = GoogleSearchScraper(query)
+			Cache.Put("google", query, results)
 			for _, url := range results {
 				bot.ChannelMessageSend(message.ChannelID, url)
 			}
