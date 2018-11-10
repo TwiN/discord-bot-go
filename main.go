@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -61,7 +60,7 @@ func init() {
 func registerHandlers(bot *discordgo.Session) {
 	bot.UpdateStatus(1, "Registering handlers")
 	for _, handler := range registeredHandlers {
-		log.Println("[registerHandlers] Registering " + runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name())
+		log.Println("[registerHandlers] Registering", runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name())
 		bot.AddHandler(handler)
 	}
 	bot.UpdateStatus(0, "")
@@ -69,5 +68,5 @@ func registerHandlers(bot *discordgo.Session) {
 
 
 func loggerHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
-	fmt.Println("[" + message.Author.Username + "] " + message.ContentWithMentionsReplaced())
+	log.Println("[", message.Author.Username, "]", message.ContentWithMentionsReplaced())
 }
