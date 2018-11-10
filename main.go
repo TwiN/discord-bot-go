@@ -48,7 +48,7 @@ var registeredHandlers []interface{}
 func init() {
 	registeredHandlers = append(registeredHandlers, 
 		Handler.ShortcutConverterHandler, 
-		Handler.SayHandler, 
+		Handler.BasicHandler,
 		Handler.GoogleSearchHandler, 
 		Handler.YoutubeSearchHandler,
 		Handler.UrbanDictionarySearchHandler,
