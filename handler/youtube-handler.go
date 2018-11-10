@@ -10,8 +10,8 @@ import (
 )
 
 
-func GoogleSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
-	const COMMAND = Constants.COMMAND_PREFIX + "google"
+func YoutubeSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
+	const COMMAND = Constants.COMMAND_PREFIX + "youtube"
 	if message.Author.ID == bot.State.User.ID {
 		return
 	}
@@ -20,7 +20,7 @@ func GoogleSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreat
 		if len(query) == 0 {
 			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
 		} else {
-			var results= GoogleSearchScraper(query)
+			var results= YoutubeSearchScraper(query)
 			for _, url := range results {
 				bot.ChannelMessageSend(message.ChannelID, url)
 			}
@@ -29,21 +29,22 @@ func GoogleSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreat
 }
 
 
-func GoogleSearchScraper(searchTerm string) []string {
-	res, err := fetchGoogleSearchPage(buildGoogleSearchUrl(searchTerm))
+func YoutubeSearchScraper(searchTerm string) []string {
+	res, err := fetchYoutubeSearchPage(buildYoutubeSearchUrl(searchTerm))
 	if err != nil {
 		return nil
 	}
-	return parseGoogleSearchResult(res)
+	return parseYoutubeSearchResult(res)
 }
 
 
-func buildGoogleSearchUrl(searchTerm string) string {
-	return fmt.Sprintf("https://www.google.com/search?q=%s&num=10&hl=en", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
+func buildYoutubeSearchUrl(searchTerm string) string {
+	return fmt.Sprintf("https://www.youtube.com/results?search_query=%s", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
 
 
-func fetchGoogleSearchPage(url string) (*http.Response, error) {
+func fetchYoutubeSearchPage(url string) (*http.Response, error) {
+	println("[fetchYoutubeSearchPage] url=" + url)
 	baseClient := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
@@ -55,18 +56,21 @@ func fetchGoogleSearchPage(url string) (*http.Response, error) {
 }
 
 
-func parseGoogleSearchResult(response *http.Response) []string {
+func parseYoutubeSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		return nil
 	}
 	var results []string
-	sel := doc.Find("div.g")
+	//sel := doc.Find("div#contents.style-scope.ytd-section-list-renderer ytd-item-section-renderer #contents")
+	//println(len(sel.Nodes))
+
+	sel := doc.Find("div#img-preload img")
 	for i := range sel.Nodes {
 		item := sel.Eq(i)
-		linkTag := item.Find("a")
-		link, _ := linkTag.Attr("href")
-		link = strings.Trim(link, " ")
+		thumbnailUrl, _ := item.Attr("src")
+		parts := strings.Split(thumbnailUrl, "/")
+		link := "https://www.youtube.com/watch?v=" + parts[4]
 		if link != "" && link != "#" && strings.HasPrefix(link, "http") {
 			result := link
 			results = append(results, result)
