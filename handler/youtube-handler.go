@@ -20,10 +20,12 @@ func YoutubeSearchHandler(bot *discordgo.Session, message *discordgo.MessageCrea
 		if len(query) == 0 {
 			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
 		} else {
+			bot.UpdateStatus(1, "| :mag_right: '" + query + "' on Youtube")
 			var results= YoutubeSearchScraper(query)
 			for _, url := range results {
 				bot.ChannelMessageSend(message.ChannelID, url)
 			}
+			bot.UpdateStatus(0, "")
 		}
 	}
 }
@@ -44,7 +46,6 @@ func buildYoutubeSearchUrl(searchTerm string) string {
 
 
 func fetchYoutubeSearchPage(url string) (*http.Response, error) {
-	println("[fetchYoutubeSearchPage] url=" + url)
 	baseClient := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
@@ -62,15 +63,16 @@ func parseYoutubeSearchResult(response *http.Response) []string {
 		return nil
 	}
 	var results []string
-	//sel := doc.Find("div#contents.style-scope.ytd-section-list-renderer ytd-item-section-renderer #contents")
-	//println(len(sel.Nodes))
-
 	sel := doc.Find("div#img-preload img")
 	for i := range sel.Nodes {
 		item := sel.Eq(i)
 		thumbnailUrl, _ := item.Attr("src")
 		parts := strings.Split(thumbnailUrl, "/")
-		link := "https://www.youtube.com/watch?v=" + parts[4]
+		videoId := parts[4]
+		if len(videoId) > 20 {
+			continue
+		}
+		link := "https://www.youtube.com/watch?v=" + videoId
 		if link != "" && link != "#" && strings.HasPrefix(link, "http") {
 			result := link
 			results = append(results, result)

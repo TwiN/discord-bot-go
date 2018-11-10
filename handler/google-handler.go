@@ -20,10 +20,12 @@ func GoogleSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreat
 		if len(query) == 0 {
 			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
 		} else {
+			bot.UpdateStatus(1, "| :mag_right: '" + query + "' on Google")
 			var results= GoogleSearchScraper(query)
 			for _, url := range results {
 				bot.ChannelMessageSend(message.ChannelID, url)
 			}
+			bot.UpdateStatus(0, "")
 		}
 	}
 }
