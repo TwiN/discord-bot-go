@@ -10,6 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	Handler "./handler"
+	"time"
 )
 
 var TOKEN = os.Getenv("SECRETS_DISCORD_BOT_TOKEN")
@@ -30,15 +31,21 @@ func main() {
 
 func connect() *discordgo.Session {
 	var bot, err = discordgo.New("Bot " + TOKEN)
-
-	log.Println("[connect] Connecting to Discord...")
+	log.Println("[main][connect] Connecting to Discord...")
 	err = bot.Open()
-	if err != nil {
-		log.Printf("[connect] Failed to establish connection with Discord: %s\n", err)
+	attempts := 3
+	for err != nil && attempts > 0 {
+		log.Printf("[main][connect] Failed to establish connection with Discord: %s\n", err)
+		log.Println("[main][connect] Retrying in 3 second")
+		time.Sleep(3 * time.Second)
+		err = bot.Open()
+		attempts--
+	}
+	if attempts == 0 {
+		log.Fatalln("[main][connect] Unable to establish connection")
 		os.Exit(1)
 	}
-	log.Println("[connect] Connected to Discord successfully!")
-
+	log.Println("[main][connect] Connected to Discord successfully!")
 	return bot
 }
 
@@ -61,7 +68,7 @@ func init() {
 func registerHandlers(bot *discordgo.Session) {
 	bot.UpdateStatus(1, "Registering handlers")
 	for _, handler := range registeredHandlers {
-		log.Println("[registerHandlers] Registering", runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name())
+		log.Println("[main][registerHandlers] Registering", runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name())
 		bot.AddHandler(handler)
 	}
 	bot.UpdateStatus(0, "")
