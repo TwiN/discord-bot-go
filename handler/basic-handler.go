@@ -21,6 +21,7 @@ func BasicHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			case "say": say(b, m, query); break
 			case "shrug": b.ChannelMessageSend(m.ChannelID, "¯\\_(ツ)_/¯"); break
 			case "purge": purge(b, m, query); break
+			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator); break
 		}
 	}
 }

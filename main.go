@@ -7,13 +7,16 @@ import (
 	"syscall"
 	"reflect"
 	"runtime"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+
 	Handler "./handler"
-	"time"
+	"./config"
 )
 
 var TOKEN = os.Getenv("SECRETS_DISCORD_BOT_TOKEN")
+var registeredHandlers []interface{}
 
 
 func main() {
@@ -49,19 +52,17 @@ func connect() *discordgo.Session {
 	return bot
 }
 
-
-var registeredHandlers []interface{}
-
 func init() {
 	registeredHandlers = append(registeredHandlers, 
-		Handler.ShortcutConverterHandler, 
+		Handler.ShortcutConverterHandler,
 		Handler.BasicHandler,
-		Handler.GoogleSearchHandler, 
+		Handler.GoogleSearchHandler,
 		Handler.YoutubeSearchHandler,
 		Handler.UrbanDictionarySearchHandler,
 		Handler.PingPongHandler,
 		loggerHandler,
 	)
+	config.Load()
 }
 
 
