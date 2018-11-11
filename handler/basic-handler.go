@@ -26,7 +26,7 @@ func BasicHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 
-func say(b *discordgo.Session, m *discordgo.MessageCreate, what string)  {
+func say(b *discordgo.Session, m *discordgo.MessageCreate, what string) {
 	if what == "" {
 		b.ChannelMessageSend(m.ChannelID, "**USAGE:** `" + Constants.COMMAND_PREFIX + "say <what>`")
 		return
@@ -38,18 +38,24 @@ func say(b *discordgo.Session, m *discordgo.MessageCreate, what string)  {
 func purge(b *discordgo.Session, m *discordgo.MessageCreate, param string)  {
 	num, err := strconv.Atoi(param)
 	if err != nil {
-		b.ChannelMessageSend(m.ChannelID, "**USAGE:** `" + Constants.COMMAND_PREFIX + "purge <number of messages>`")
+		sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "purge <number of messages>`")
 		return
 	}
 	if num > 10 {
-		b.ChannelMessageSend(m.ChannelID, "You cannot purge more than 10 messages at once.")
+		sendErrorMessage(b, m, "You cannot purge more than 10 messages at once.")
 		return
 	}
 	var messagesToPurge []string
-	messages, _ := b.ChannelMessages(m.ChannelID, num, "", "", "")
+	messages, _ := b.ChannelMessages(m.ChannelID, num, m.ID, "", "")
 	for _, msg := range messages {
 		messagesToPurge = append(messagesToPurge, msg.ID)
 	}
 	b.ChannelMessagesBulkDelete(m.ChannelID, messagesToPurge) // 1 call is better than N calls
-	b.ChannelMessageSend(m.ChannelID, "Purged " + string(num) + " messages")
+	b.MessageReactionAdd(m.ChannelID, m.ID, Constants.EMOJI_SUCCESS)
+}
+
+
+func sendErrorMessage(b *discordgo.Session, m *discordgo.MessageCreate, errorMessage string) {
+	b.MessageReactionAdd(m.ChannelID, m.ID, Constants.EMOJI_FAILURE)
+	b.ChannelMessageSend(m.ChannelID, errorMessage)
 }
