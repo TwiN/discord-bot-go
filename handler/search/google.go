@@ -1,52 +1,32 @@
-package handler
+package search
 
 import (
 	"strings"
 	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/TwinProduction/go-away"
 	"net/http"
-	Constants "../global"
-	Cache "../cache"
+	Constants "../../global"
+	"../../cache"
 )
 
-
-func GoogleSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
+func GoogleSearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
 	const COMMAND = Constants.COMMAND_PREFIX + "google"
-	if message.Author.ID == bot.State.User.ID {
-		return
-	}
-	if strings.HasPrefix(message.Content, COMMAND) {
-		var query = strings.Trim(strings.Replace(message.Content, COMMAND, "", 1), " ")
 
-		if goaway.IsProfane(query) {
-			bot.ChannelMessageSend(message.ChannelID, "That doesn't sound like a smart thing to search...")
-			return
+	if len(query) == 0 {
+		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+COMMAND+" <search terms>`")
+	} else {
+		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on Google")
+		var results = googleSearchScraper(query)
+		cache.Put("google", query, results)
+		for _, url := range results {
+			bot.ChannelMessageSend(message.ChannelID, url)
 		}
-
-		if Cache.Has("google", query) {
-			for _, url := range Cache.Get("google", query) {
-				bot.ChannelMessageSend(message.ChannelID, "[cached] " + url)
-			}
-			return
-		}
-		if len(query) == 0 {
-			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
-		} else {
-			bot.UpdateStatus(1, "| :mag_right: '" + query + "' on Google")
-			var results = GoogleSearchScraper(query)
-			Cache.Put("google", query, results)
-			for _, url := range results {
-				bot.ChannelMessageSend(message.ChannelID, url)
-			}
-			bot.UpdateStatus(0, "")
-		}
+		bot.UpdateStatus(0, "")
 	}
 }
 
-
-func GoogleSearchScraper(searchTerm string) []string {
+func googleSearchScraper(searchTerm string) []string {
 	res, err := fetchGoogleSearchPage(buildGoogleSearchUrl(searchTerm))
 	if err != nil {
 		return nil
@@ -54,11 +34,9 @@ func GoogleSearchScraper(searchTerm string) []string {
 	return parseGoogleSearchResult(res)
 }
 
-
 func buildGoogleSearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.google.com/search?q=%s&num=10&hl=en", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
-
 
 func fetchGoogleSearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -70,7 +48,6 @@ func fetchGoogleSearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
-
 
 func parseGoogleSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)

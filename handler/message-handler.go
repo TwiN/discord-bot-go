@@ -4,11 +4,14 @@ import (
 	"strings"
 	"strconv"
 	"github.com/bwmarrin/discordgo"
+	"github.com/TwinProduction/go-away"
+	"./search"
 	Constants "../global"
+	"../cache"
 )
 
 
-func BasicHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
+func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == b.State.User.ID {
 		return
 	}
@@ -17,12 +20,44 @@ func BasicHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 		cmd := arguments[0]
 		query := strings.Replace(m.Content, Constants.COMMAND_PREFIX + cmd + " ", "", 1)
 
+		println("cmd="+cmd+"; query="+query)
 		switch strings.ToLower(cmd) {
-			case "say": say(b, m, query); break
-			case "shrug": b.ChannelMessageSend(m.ChannelID, "¯\\_(ツ)_/¯"); break
-			case "purge": purge(b, m, query); break
-			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator); break
+			case "say": say(b, m, query)
+			case "shrug": b.ChannelMessageSend(m.ChannelID, "¯\\_(ツ)_/¯")
+			case "purge": purge(b, m, query)
+			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
+
+			case "google": fallthrough
+			case "g": cmd = "google"; fallthrough
+			case "youtube": fallthrough
+			case "yt": cmd = "youtube"; fallthrough
+			case "urban":
+				searchHandler(b, m, cmd, query)
 		}
+	}
+}
+
+
+func searchHandler(b *discordgo.Session, m *discordgo.MessageCreate, provider string, query string) {
+	if cache.Has(provider, query) {
+		for _, value := range cache.Get(provider, query) {
+			b.ChannelMessageSend(m.ChannelID, "**[cached]** " + value)
+		}
+		return
+	}
+	if goaway.IsProfane(query) {
+		b.ChannelMessageSend(m.ChannelID, "That doesn't sound like a smart thing to search...")
+		cache.Put(provider, query, []string{"That doesn't sound like a smart thing to search..."})
+		return
+	}
+
+	switch strings.ToLower(provider) {
+		case "youtube":
+			search.YoutubeSearch(b, m, query)
+		case "google":
+			search.GoogleSearch(b, m, query)
+		case "urban":
+			search.UrbanDictionarySearch(b, m, query)
 	}
 }
 

@@ -54,12 +54,7 @@ func connect() *discordgo.Session {
 
 func init() {
 	registeredHandlers = append(registeredHandlers, 
-		Handler.ShortcutConverterHandler,
-		Handler.BasicHandler,
-		Handler.GoogleSearchHandler,
-		Handler.YoutubeSearchHandler,
-		Handler.UrbanDictionarySearchHandler,
-		Handler.PingPongHandler,
+		Handler.MessageHandler,
 		loggerHandler,
 	)
 	config.Load()

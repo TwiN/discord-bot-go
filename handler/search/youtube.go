@@ -1,52 +1,32 @@
-package handler
+package search
 
 import (
 	"strings"
 	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/TwinProduction/go-away"
 	"net/http"
-	Constants "../global"
-	Cache "../cache"
+	Constants "../../global"
+	"../../cache"
 )
 
-
-func YoutubeSearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
+func YoutubeSearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
 	const COMMAND = Constants.COMMAND_PREFIX + "youtube"
-	if message.Author.ID == bot.State.User.ID {
-		return
-	}
-	if strings.HasPrefix(message.Content, COMMAND) {
-		var query = strings.Trim(strings.Replace(message.Content, COMMAND, "", 1), " ")
 
-		if goaway.IsProfane(query) {
-			bot.ChannelMessageSend(message.ChannelID, "That doesn't sound like a smart thing to search...")
-			return
+	if len(query) == 0 {
+		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+COMMAND+" <search terms>`")
+	} else {
+		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on Youtube")
+		var results = youtubeSearchScraper(query)
+		cache.Put("youtube", query, results)
+		for _, url := range results {
+			bot.ChannelMessageSend(message.ChannelID, url)
 		}
-
-		if Cache.Has("youtube", query) {
-			for _, url := range Cache.Get("youtube", query) {
-				bot.ChannelMessageSend(message.ChannelID, "[cached] " + url)
-			}
-			return
-		}
-		if len(query) == 0 {
-			bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `" + COMMAND + " <search terms>`")
-		} else {
-			bot.UpdateStatus(1, "| :mag_right: '" + query + "' on Youtube")
-			var results= YoutubeSearchScraper(query)
-			Cache.Put("youtube", query, results)
-			for _, url := range results {
-				bot.ChannelMessageSend(message.ChannelID, url)
-			}
-			bot.UpdateStatus(0, "")
-		}
+		bot.UpdateStatus(0, "")
 	}
 }
 
-
-func YoutubeSearchScraper(searchTerm string) []string {
+func youtubeSearchScraper(searchTerm string) []string {
 	res, err := fetchYoutubeSearchPage(buildYoutubeSearchUrl(searchTerm))
 	if err != nil {
 		return nil
@@ -54,11 +34,9 @@ func YoutubeSearchScraper(searchTerm string) []string {
 	return parseYoutubeSearchResult(res)
 }
 
-
 func buildYoutubeSearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.youtube.com/results?search_query=%s", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
-
 
 func fetchYoutubeSearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -70,7 +48,6 @@ func fetchYoutubeSearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
-
 
 func parseYoutubeSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)
