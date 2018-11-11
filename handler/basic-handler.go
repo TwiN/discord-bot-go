@@ -41,12 +41,15 @@ func purge(b *discordgo.Session, m *discordgo.MessageCreate, param string)  {
 		b.ChannelMessageSend(m.ChannelID, "**USAGE:** `" + Constants.COMMAND_PREFIX + "purge <number of messages>`")
 		return
 	}
-	b.ChannelMessageSend(m.ChannelID, "Purging " + param + " messages")
-	b.ChannelMessageDelete(m.ChannelID, m.ID)
-
-	messages, _ := b.ChannelMessages(m.ChannelID, num, "", "", "")
-	for msg := range messages {
-		println(msg)
+	if num > 10 {
+		b.ChannelMessageSend(m.ChannelID, "You cannot purge more than 10 messages at once.")
+		return
 	}
-	b.ChannelMessagesBulkDelete(m.ChannelID, []string{})
+	var messagesToPurge []string
+	messages, _ := b.ChannelMessages(m.ChannelID, num, "", "", "")
+	for _, msg := range messages {
+		messagesToPurge = append(messagesToPurge, msg.ID)
+	}
+	b.ChannelMessagesBulkDelete(m.ChannelID, messagesToPurge) // 1 call is better than N calls
+	b.ChannelMessageSend(m.ChannelID, "Purged " + string(num) + " messages")
 }
