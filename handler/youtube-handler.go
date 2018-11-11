@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/TwinProduction/go-away"
 	"net/http"
 	Constants "../global"
 	Cache "../cache"
@@ -18,6 +19,12 @@ func YoutubeSearchHandler(bot *discordgo.Session, message *discordgo.MessageCrea
 	}
 	if strings.HasPrefix(message.Content, COMMAND) {
 		var query = strings.Trim(strings.Replace(message.Content, COMMAND, "", 1), " ")
+
+		if goaway.IsProfane(query) {
+			bot.ChannelMessageSend(message.ChannelID, "That doesn't sound like a smart thing to search...")
+			return
+		}
+
 		if Cache.Has("youtube", query) {
 			for _, url := range Cache.Get("youtube", query) {
 				bot.ChannelMessageSend(message.ChannelID, "[cached] " + url)
