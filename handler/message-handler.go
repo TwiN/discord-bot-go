@@ -8,6 +8,7 @@ import (
 	"./search"
 	Constants "../global"
 	"../cache"
+	"../permission"
 )
 
 
@@ -17,23 +18,43 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if strings.HasPrefix(m.Content, Constants.COMMAND_PREFIX) {
 		arguments := strings.Split(strings.Trim(strings.Replace(m.Content, Constants.COMMAND_PREFIX, "", 1), " "), " ")
-		cmd := arguments[0]
-		query := strings.Replace(m.Content, Constants.COMMAND_PREFIX + cmd + " ", "", 1)
+		query := strings.Replace(m.Content, Constants.COMMAND_PREFIX + arguments[0] + " ", "", 1)
+		cmd := swapAlias(strings.ToLower(arguments[0]))
 
-		println("cmd="+cmd+"; query="+query)
-		switch strings.ToLower(cmd) {
+		if !permission.IsAllowed(cmd, m.Author.ID) {
+			sendErrorMessage(b, m, "You have insufficient permissions")
+			return
+		}
+		switch cmd {
 			case "say": say(b, m, query)
-			case "shrug": b.ChannelMessageSend(m.ChannelID, "¯\\_(ツ)_/¯")
+			case "shrug": b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯"); b.ChannelMessageDelete(m.ChannelID, m.ID)
 			case "purge": purge(b, m, query)
 			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
-
+			case "perms":
+				if len(arguments) != 4 {
+					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "perms <add|remove> <cmd> <userId>`")
+					break
+				}
+				permissionHandler(b, m, arguments[1], arguments[2], arguments[3])
 			case "google": fallthrough
-			case "g": cmd = "google"; fallthrough
 			case "youtube": fallthrough
-			case "yt": cmd = "youtube"; fallthrough
 			case "urban":
 				searchHandler(b, m, cmd, query)
 		}
+	}
+}
+
+
+func permissionHandler(b *discordgo.Session, m *discordgo.MessageCreate, action string, cmd string, userId string) {
+	switch strings.ToLower(action) {
+		case "add":
+			permission.AddPermission(cmd, userId)
+			sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been granted to userId " + userId)
+		case "remove":
+			permission.RemovePermission(cmd, userId)
+			sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been removed from userId " + userId)
+		default:
+			sendErrorMessage(b, m, "Invalid action.")
 	}
 }
 
@@ -50,8 +71,7 @@ func searchHandler(b *discordgo.Session, m *discordgo.MessageCreate, provider st
 		cache.Put(provider, query, []string{"That doesn't sound like a smart thing to search..."})
 		return
 	}
-
-	switch strings.ToLower(provider) {
+	switch provider {
 		case "youtube":
 			search.YoutubeSearch(b, m, query)
 		case "google":
@@ -91,7 +111,26 @@ func purge(b *discordgo.Session, m *discordgo.MessageCreate, param string)  {
 }
 
 
-func sendErrorMessage(b *discordgo.Session, m *discordgo.MessageCreate, errorMessage string) {
-	b.MessageReactionAdd(m.ChannelID, m.ID, Constants.EMOJI_FAILURE)
-	b.ChannelMessageSend(m.ChannelID, errorMessage)
+func sendErrorMessage(b *discordgo.Session, m *discordgo.MessageCreate, msg string) {
+	sendMessage(b, m, Constants.EMOJI_FAILURE, msg)
+}
+
+
+func sendSuccessMessage(b *discordgo.Session, m *discordgo.MessageCreate, msg string) {
+	sendMessage(b, m, Constants.EMOJI_SUCCESS, msg)
+}
+
+
+func sendMessage(b *discordgo.Session, m *discordgo.MessageCreate, emojiId string, msg string) {
+	b.MessageReactionAdd(m.ChannelID, m.ID, emojiId)
+	b.ChannelMessageSend(m.ChannelID, msg)
+}
+
+
+func swapAlias(cmd string) string {
+	switch cmd {
+	case "g": return "google"
+	case "yt": return "youtube"
+	}
+	return cmd
 }

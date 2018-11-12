@@ -7,17 +7,20 @@ import (
 )
 
 type Configuration struct {
-	Users struct {
-		OwnerId   string
-		BlackList []string
-	}
-	AutoWelcome bool
+	Users         UsersConfiguration
+	AutoWelcome   bool
+}
+type UsersConfiguration struct {
+	OwnerId       string
+	BlackList     []string
+	Permissions   map[string][]string
 }
 
 var Config Configuration
 
+
 func Load() {
-	log.Println("[config][init] Loading configuration file")
+	log.Println("[config][Load] Loading configuration file")
 	configFile, _ := os.Open("config.json")
 	defer configFile.Close()
 	decoder := json.NewDecoder(configFile)
@@ -27,4 +30,18 @@ func Load() {
 		log.Fatalln("[config][init] Unable to decode configuration:", err)
 	}
 	Config = configuration
+}
+
+
+func Save() {
+	configFile, err := os.Create("config.json")
+	defer configFile.Close()
+	if err != nil {
+		log.Fatalln("[config][Save] Unable to open configuration file:", err)
+	}
+	data, err := json.MarshalIndent(Config, "", "  ")
+	if err != nil {
+		log.Fatalln("[config][Save] Unable to save configuration:", err)
+	}
+	configFile.WriteString(string(data))
 }
