@@ -21,6 +21,9 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 		query := strings.Replace(m.Content, Constants.COMMAND_PREFIX + arguments[0] + " ", "", 1)
 		cmd := swapAlias(strings.ToLower(arguments[0]))
 
+		if permission.IsBlacklisted(m.Author.ID) {
+			return
+		}
 		if !permission.IsAllowed(cmd, m.Author.ID) {
 			sendErrorMessage(b, m, "You have insufficient permissions")
 			return
@@ -30,6 +33,12 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			case "shrug": b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯"); b.ChannelMessageDelete(m.ChannelID, m.ID)
 			case "purge": purge(b, m, query)
 			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
+			case "blacklist":
+				if len(arguments) != 3 {
+					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <userId>`")
+					break
+				}
+				blacklistHandler(b, m, arguments[1], arguments[2])
 			case "perms":
 				if len(arguments) != 4 {
 					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "perms <add|remove> <cmd> <userId>`")
@@ -53,6 +62,20 @@ func permissionHandler(b *discordgo.Session, m *discordgo.MessageCreate, action 
 		case "remove":
 			permission.RemovePermission(cmd, userId)
 			sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been removed from userId " + userId)
+		default:
+			sendErrorMessage(b, m, "Invalid action.")
+	}
+}
+
+
+func blacklistHandler(b *discordgo.Session, m *discordgo.MessageCreate, action string, userId string) {
+	switch strings.ToLower(action) {
+		case "add":
+			permission.Blacklist(userId)
+			sendSuccessMessage(b, m, "UserId " + userId + " has been added to the blacklist")
+		case "remove":
+			permission.Unblacklist(userId)
+			sendSuccessMessage(b, m, "UserId " + userId + " has been removed from the blacklist")
 		default:
 			sendErrorMessage(b, m, "Invalid action.")
 	}

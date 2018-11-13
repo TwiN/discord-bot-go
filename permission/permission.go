@@ -12,6 +12,8 @@ func IsAllowed(action string, userId string) bool {
 		return true
 	}
 	switch strings.Replace(strings.ToLower(action), Constants.COMMAND_PREFIX, "", -1) {
+		case "blacklist": fallthrough
+		case "unblacklist": fallthrough
 		case "perms add": fallthrough
 		case "perms remove":
 			return config.Config.Users.OwnerId == userId
@@ -22,6 +24,39 @@ func IsAllowed(action string, userId string) bool {
 			}
 			return isInListOrListContainsAsterisk(config.Config.Users.Permissions[action], userId)
 	}
+}
+
+
+func Blacklist(userId string)  {
+	if config.Config.Users.BlackList == nil {
+		config.Config.Users.BlackList = []string{}
+	}
+	if !IsBlacklisted(userId) {
+		config.Config.Users.BlackList = append(config.Config.Users.BlackList, userId)
+		config.Save()
+	}
+}
+
+
+func Unblacklist(userId string)  {
+	if config.Config.Users.BlackList == nil {
+		config.Config.Users.BlackList = []string{}
+	}
+	for i, u := range config.Config.Users.BlackList {
+		if u == userId {
+			config.Config.Users.BlackList = append(config.Config.Users.BlackList[:i], config.Config.Users.BlackList[i+1:]...)
+			config.Save()
+		}
+	}
+}
+
+
+func IsBlacklisted(userId string) bool {
+	if config.Config.Users.BlackList == nil {
+		config.Config.Users.BlackList = []string{}
+		return false
+	}
+	return isInListOrListContainsAsterisk(config.Config.Users.BlackList, userId)
 }
 
 
