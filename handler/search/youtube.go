@@ -69,7 +69,7 @@ func parseYoutubeSearchResult(response *http.Response) []string {
 			result := link
 			results = append(results, result)
 		}
-		if len(results) >= 3 {
+		if len(results) >= 2 {
 			break
 		}
 	}

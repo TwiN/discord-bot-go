@@ -35,7 +35,7 @@ func googleSearchScraper(searchTerm string) []string {
 }
 
 func buildGoogleSearchUrl(searchTerm string) string {
-	return fmt.Sprintf("https://www.google.com/search?q=%s&num=10&hl=en", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
+	return fmt.Sprintf("https://www.google.com/search?q=%s&num=5&hl=en&safe=active", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
 
 func fetchGoogleSearchPage(url string) (*http.Response, error) {
@@ -65,7 +65,7 @@ func parseGoogleSearchResult(response *http.Response) []string {
 			result := link
 			results = append(results, result)
 		}
-		if len(results) >= 3 {
+		if len(results) >= 2 {
 			break
 		}
 	}
