@@ -9,6 +9,7 @@ import (
 	Constants "../global"
 	"../cache"
 	"../permission"
+	"./roleplay"
 )
 
 
@@ -33,6 +34,8 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			case "shrug": b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯"); b.ChannelMessageDelete(m.ChannelID, m.ID)
 			case "purge": purge(b, m, query)
 			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
+			case "pat": roleplay.Pat(b, m)
+
 			case "blacklist":
 				if len(arguments) != 3 {
 					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <userId>`")
@@ -134,7 +137,7 @@ func purge(b *discordgo.Session, m *discordgo.MessageCreate, param string)  {
 		sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "purge <number of messages>`")
 		return
 	}
-	if num > 10 {
+	if num > 25 {
 		sendErrorMessage(b, m, "You cannot purge more than 10 messages at once.")
 		return
 	}

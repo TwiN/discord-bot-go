@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"runtime"
 	"time"
+	"math/rand"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -58,6 +59,7 @@ func init() {
 		loggerHandler,
 	)
 	config.Load()
+	rand.Seed(time.Now().Unix())
 }
 
 
