@@ -27,27 +27,33 @@ func IsAllowed(action string, userId string) bool {
 }
 
 
-func Blacklist(userId string)  {
+func Blacklist(userId string) bool {
 	if config.Config.Users.BlackList == nil {
 		config.Config.Users.BlackList = []string{}
+		return false
 	}
 	if userId != config.Config.Users.OwnerId && !isInListOrListContainsAsterisk(config.Config.Users.Admins, userId) && !IsBlacklisted(userId) {
 		config.Config.Users.BlackList = append(config.Config.Users.BlackList, userId)
 		config.Save()
+		return true
 	}
+	return false
 }
 
 
-func Unblacklist(userId string)  {
+func Unblacklist(userId string) bool {
 	if config.Config.Users.BlackList == nil {
 		config.Config.Users.BlackList = []string{}
+		return false
 	}
 	for i, u := range config.Config.Users.BlackList {
 		if u == userId {
 			config.Config.Users.BlackList = append(config.Config.Users.BlackList[:i], config.Config.Users.BlackList[i+1:]...)
 			config.Save()
+			return true
 		}
 	}
+	return false
 }
 
 
@@ -60,14 +66,16 @@ func IsBlacklisted(userId string) bool {
 }
 
 
-func AddPermission(action string, userId string)  {
+func AddPermission(action string, userId string) bool {
 	if config.Config.Users.Permissions == nil {
 		config.Config.Users.Permissions = make(map[string][]string)
 	}
-	if !IsAllowed(action, userId) {
+	if !IsAllowed(action, userId) { // makes sure the user doesn't already have that permission
 		config.Config.Users.Permissions[action] = append(config.Config.Users.Permissions[action], userId)
 		config.Save()
+		return true
 	}
+	return false
 }
 
 

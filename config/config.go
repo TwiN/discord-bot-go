@@ -12,6 +12,7 @@ type Configuration struct {
 }
 type UsersConfiguration struct {
 	OwnerId       string
+	Admins        []string
 	BlackList     []string
 	Permissions   map[string][]string
 }

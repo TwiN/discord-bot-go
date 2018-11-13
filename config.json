@@ -5,7 +5,10 @@
       "151489610713792512"
     ],
     "BlackList": [
-      "1"
+      "1",
+      ".",
+      "\ntest",
+      "\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \ntest"
     ],
     "Permissions": {
       "google": [

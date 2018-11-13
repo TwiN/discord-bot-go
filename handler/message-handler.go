@@ -57,11 +57,17 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 func permissionHandler(b *discordgo.Session, m *discordgo.MessageCreate, action string, cmd string, userId string) {
 	switch strings.ToLower(action) {
 		case "add":
-			permission.AddPermission(cmd, userId)
-			sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been granted to userId " + userId)
+			if permission.AddPermission(cmd, userId) {
+				sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been granted to userId " + userId)
+			} else {
+				sendErrorMessage(b, m, "User passed as parameter already has access to the given command.")
+			}
 		case "remove":
-			permission.RemovePermission(cmd, userId)
-			sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been removed from userId " + userId)
+			if permission.RemovePermission(cmd, userId) {
+				sendSuccessMessage(b, m, "Permissions for '" + cmd + "' has been removed from userId " + userId)
+			} else {
+				sendErrorMessage(b, m, "User passed as parameter already doesn't have access to the given command.")
+			}
 		default:
 			sendErrorMessage(b, m, "Invalid action.")
 	}
@@ -71,11 +77,19 @@ func permissionHandler(b *discordgo.Session, m *discordgo.MessageCreate, action 
 func blacklistHandler(b *discordgo.Session, m *discordgo.MessageCreate, action string, userId string) {
 	switch strings.ToLower(action) {
 		case "add":
-			permission.Blacklist(userId)
-			sendSuccessMessage(b, m, "UserId " + userId + " has been added to the blacklist")
+			if permission.Blacklist(userId) {
+				sendSuccessMessage(b, m, "UserId " + userId + " has been added to the blacklist")
+			} else {
+				sendErrorMessage(b, m, "Couldn't add that user to the blacklist!")
+			}
+
 		case "remove":
-			permission.Unblacklist(userId)
-			sendSuccessMessage(b, m, "UserId " + userId + " has been removed from the blacklist")
+			if permission.Unblacklist(userId) {
+				sendSuccessMessage(b, m, "UserId " + userId + " has been removed from the blacklist")
+			} else {
+				sendErrorMessage(b, m, "There is no user with that id in the blacklist")
+
+			}
 		default:
 			sendErrorMessage(b, m, "Invalid action.")
 	}
