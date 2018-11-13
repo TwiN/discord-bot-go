@@ -1,7 +1,12 @@
 {
   "Users": {
     "OwnerId": "213857758292869120",
-    "BlackList": [],
+    "Admins": [
+      "151489610713792512"
+    ],
+    "BlackList": [
+      "1"
+    ],
     "Permissions": {
       "google": [
         "151489610713792512"
