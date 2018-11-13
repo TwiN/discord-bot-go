@@ -34,7 +34,10 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			case "shrug": b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯"); b.ChannelMessageDelete(m.ChannelID, m.ID)
 			case "purge": purge(b, m, query)
 			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
+
 			case "pat": roleplay.Pat(b, m)
+			case "hug": roleplay.Hug(b, m)
+			case "greet": roleplay.Greet(b, m)
 
 			case "blacklist":
 				if len(arguments) != 3 {
@@ -48,6 +51,7 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 					break
 				}
 				permissionHandler(b, m, arguments[1], arguments[2], arguments[3])
+
 			case "google": fallthrough
 			case "youtube": fallthrough
 			case "urban":

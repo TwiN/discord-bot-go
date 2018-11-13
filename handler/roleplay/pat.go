@@ -13,6 +13,9 @@ var pats = []string{
 	"https://media1.tenor.com/images/1e92c03121c0bd6688d17eef8d275ea7/tenor.gif?itemid=9920853",
 	"https://data.whicdn.com/images/297125626/original.gif",
 	"https://78.media.tumblr.com/755e34a2e227e153ba64d4a4f27848fe/tumblr_nahgozuIwM1rbnx7io1_500.gif",
+	"https://media1.tenor.com/images/c0bcaeaa785a6bdf1fae82ecac65d0cc/tenor.gif?itemid=7453915",
+	"http://i.imgur.com/laEy6LU.gif",
+	"https://archive-media-0.nyafuu.org/c/image/1483/55/1483553008493.gif",
 	}
 
 
