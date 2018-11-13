@@ -3,9 +3,7 @@
     "OwnerId": "213857758292869120",
     "BlackList": null,
     "Permissions": {
-      "purge": [
-        "488493465458704384"
-      ],
+      "purge": [],
       "youtube": [],
       "google": [],
       "urban": [],
