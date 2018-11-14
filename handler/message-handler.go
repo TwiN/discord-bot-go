@@ -12,6 +12,41 @@ import (
 	"./roleplay"
 )
 
+type CommandInfo struct {
+	cmd           string
+	category      string
+	description   string
+}
+
+
+var commands = []CommandInfo {
+	CommandInfo {
+		cmd: "say",
+		category: "misc",
+		description: "Repeats what the user wrote",
+	},
+	CommandInfo {
+		cmd: "shrug",
+		category: "misc",
+		description: "¯\\_(ツ)_/¯",
+	},
+	CommandInfo {
+		cmd: "pat",
+		category: "roleplay",
+		description: "¯\\_(ツ)_/¯",
+	},
+	CommandInfo {
+		cmd: "hug",
+		category: "roleplay",
+		description: "¯\\_(ツ)_/¯",
+	},
+	CommandInfo {
+		cmd: "greet",
+		category: "roleplay",
+		description: "¯\\_(ツ)_/¯",
+	},
+}
+
 
 func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == b.State.User.ID {
@@ -30,15 +65,20 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		switch cmd {
+			// Misc commands
 			case "say": say(b, m, query)
 			case "shrug": b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯"); b.ChannelMessageDelete(m.ChannelID, m.ID)
-			case "purge": purge(b, m, query)
 			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
-
+			// Roleplaying commands
 			case "pat": roleplay.Pat(b, m)
 			case "hug": roleplay.Hug(b, m)
 			case "greet": roleplay.Greet(b, m)
-
+			// Searching commands
+			case "google": fallthrough
+			case "youtube": fallthrough
+			case "urban": searchHandler(b, m, cmd, query)
+			// Managing commands
+			case "purge": purge(b, m, query)
 			case "blacklist":
 				if len(arguments) != 3 {
 					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <userId>`")
@@ -51,11 +91,6 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 					break
 				}
 				permissionHandler(b, m, arguments[1], arguments[2], arguments[3])
-
-			case "google": fallthrough
-			case "youtube": fallthrough
-			case "urban":
-				searchHandler(b, m, cmd, query)
 		}
 	}
 }
@@ -89,13 +124,11 @@ func blacklistHandler(b *discordgo.Session, m *discordgo.MessageCreate, action s
 			} else {
 				sendErrorMessage(b, m, "Couldn't add that user to the blacklist!")
 			}
-
 		case "remove":
 			if permission.Unblacklist(userId) {
 				sendSuccessMessage(b, m, "UserId " + userId + " has been removed from the blacklist")
 			} else {
 				sendErrorMessage(b, m, "There is no user with that id in the blacklist")
-
 			}
 		default:
 			sendErrorMessage(b, m, "Invalid action.")
@@ -173,8 +206,8 @@ func sendMessage(b *discordgo.Session, m *discordgo.MessageCreate, emojiId strin
 
 func swapAlias(cmd string) string {
 	switch cmd {
-	case "g": return "google"
-	case "yt": return "youtube"
+		case "g": return "google"
+		case "yt": return "youtube"
 	}
 	return cmd
 }
