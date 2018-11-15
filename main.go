@@ -53,6 +53,7 @@ func connect() *discordgo.Session {
 	return bot
 }
 
+
 func init() {
 	registeredHandlers = append(registeredHandlers, 
 		Handler.MessageHandler,
