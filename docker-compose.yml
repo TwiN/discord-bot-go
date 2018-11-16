@@ -1,0 +1,7 @@
+version: '3'
+services:
+  discord-bot-go:
+    container_name: "discord-bot-go"
+    build: .
+    environment:
+      - "SECRETS_DISCORD_BOT_TOKEN=${SECRETS_DISCORD_BOT_TOKEN}"
