@@ -42,7 +42,7 @@ var commands = map[string]CommandInfo {
 	},
 	"pat": {
 		category:    "roleplay",
-		description: "¯\\_(ツ)_/¯",
+		description: "Sends a GIF or an image of a character patting the head of another character",
 		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			roleplay.Pat(b, m)
 			return true
@@ -50,7 +50,7 @@ var commands = map[string]CommandInfo {
 	},
 	"hug": {
 		category:    "roleplay",
-		description: "¯\\_(ツ)_/¯",
+		description: "Sends a GIF or an image of a character hugging another character",
 		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			roleplay.Hug(b, m)
 			return true
@@ -58,7 +58,7 @@ var commands = map[string]CommandInfo {
 	},
 	"greet": {
 		category:    "roleplay",
-		description: "¯\\_(ツ)_/¯",
+		description: "Sends a GIF or an image of a character greeting another character",
 		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			roleplay.Greet(b, m)
 			return true
@@ -66,20 +66,20 @@ var commands = map[string]CommandInfo {
 	},
 	"youtube": {
 		category:    "search",
-		description: "¯\\_(ツ)_/¯",
+		description: "Returns the top YouTube search results for the given query",
 		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			return searchHandler(b, m, cmd, query)
 		},
 	},
 	"google": {
 		category:    "search",
-		description: "¯\\_(ツ)_/¯",
+		description: "Returns the top Google search results for the given query",
 		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			return searchHandler(b, m, cmd, query)
 		},
 	},
 	"urban": {
-		category:    "search",
+		category:    "Returns the UrbanDictionary definition of the given query",
 		description: "¯\\_(ツ)_/¯",
 		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			return searchHandler(b, m, cmd, query)
