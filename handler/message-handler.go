@@ -13,37 +13,110 @@ import (
 )
 
 type CommandInfo struct {
-	cmd           string
 	category      string
 	description   string
+	Execute       func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool
 }
 
 
-var commands = []CommandInfo {
-	CommandInfo {
-		cmd: "say",
-		category: "misc",
-		description: "Repeats what the user wrote",
-	},
-	CommandInfo {
-		cmd: "shrug",
-		category: "misc",
+
+var commands = map[string]CommandInfo {
+	"shrug": {
+		category:    "misc",
 		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			_, e := b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯")
+			if e != nil {
+				return false
+			}
+			return b.ChannelMessageDelete(m.ChannelID, m.ID) == nil
+		},
 	},
-	CommandInfo {
-		cmd: "pat",
-		category: "roleplay",
-		description: "¯\\_(ツ)_/¯",
+	"whoami": {
+		category:    "misc",
+		description: "Replies with the username of the user followed by the discriminator, e.g. `Twin#9089`.",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
+			return true
+		},
 	},
-	CommandInfo {
-		cmd: "hug",
-		category: "roleplay",
+	"pat": {
+		category:    "roleplay",
 		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			roleplay.Pat(b, m)
+			return true
+		},
 	},
-	CommandInfo {
-		cmd: "greet",
-		category: "roleplay",
+	"hug": {
+		category:    "roleplay",
 		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			roleplay.Hug(b, m)
+			return true
+		},
+	},
+	"greet": {
+		category:    "roleplay",
+		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			roleplay.Greet(b, m)
+			return true
+		},
+	},
+	"youtube": {
+		category:    "search",
+		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			return searchHandler(b, m, cmd, query)
+		},
+	},
+	"google": {
+		category:    "search",
+		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			return searchHandler(b, m, cmd, query)
+		},
+	},
+	"urban": {
+		category:    "search",
+		description: "¯\\_(ツ)_/¯",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			return searchHandler(b, m, cmd, query)
+		},
+	},
+	"purge": {
+		category:    "moderation",
+		description: "Removes N messages from the current channel",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			// TODO: Check if user is allowed to purge first
+			purge(b, m, query)
+			return true
+		},
+	},
+	"blacklist": {
+		category:    "moderation",
+		description: "Manages blacklisted users",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			if len(arguments) != 3 {
+				sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <userId>`")
+				return false
+			}
+			blacklistHandler(b, m, arguments[1], arguments[2])
+			return true
+		},
+	},
+	"perms": {
+		category:    "moderation",
+		description: "Manages permissions",
+		Execute: func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			if len(arguments) != 4 {
+				sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "perms <add|remove> <cmd> <userId>`")
+				return false
+			}
+			permissionHandler(b, m, arguments[1], arguments[2], arguments[3])
+			return true
+		},
 	},
 }
 
@@ -64,33 +137,9 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			sendErrorMessage(b, m, "You have insufficient permissions")
 			return
 		}
-		switch cmd {
-			// Misc commands
-			case "say": say(b, m, query)
-			case "shrug": b.ChannelMessageSend(m.ChannelID, m.Author.Mention()+": ¯\\_(ツ)_/¯"); b.ChannelMessageDelete(m.ChannelID, m.ID)
-			case "whoami": b.ChannelMessageSend(m.ChannelID, m.Author.Username + "#" + m.Author.Discriminator)
-			// Roleplaying commands
-			case "pat": roleplay.Pat(b, m)
-			case "hug": roleplay.Hug(b, m)
-			case "greet": roleplay.Greet(b, m)
-			// Searching commands
-			case "google": fallthrough
-			case "youtube": fallthrough
-			case "urban": searchHandler(b, m, cmd, query)
-			// Managing commands
-			case "purge": purge(b, m, query)
-			case "blacklist":
-				if len(arguments) != 3 {
-					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <userId>`")
-					break
-				}
-				blacklistHandler(b, m, arguments[1], arguments[2])
-			case "perms":
-				if len(arguments) != 4 {
-					sendErrorMessage(b, m, "**USAGE:** `" + Constants.COMMAND_PREFIX + "perms <add|remove> <cmd> <userId>`")
-					break
-				}
-				permissionHandler(b, m, arguments[1], arguments[2], arguments[3])
+		commandInfo, isKeyPresent := commands[cmd]
+		if isKeyPresent {
+			commandInfo.Execute(b, m, cmd, query, arguments)
 		}
 	}
 }
@@ -136,17 +185,17 @@ func blacklistHandler(b *discordgo.Session, m *discordgo.MessageCreate, action s
 }
 
 
-func searchHandler(b *discordgo.Session, m *discordgo.MessageCreate, provider string, query string) {
+func searchHandler(b *discordgo.Session, m *discordgo.MessageCreate, provider string, query string) bool {
 	if cache.Has(provider, query) {
 		for _, value := range cache.Get(provider, query) {
 			b.ChannelMessageSend(m.ChannelID, "**[cached]** " + value)
 		}
-		return
+		return true
 	}
 	if goaway.IsProfane(query) {
 		b.ChannelMessageSend(m.ChannelID, "That doesn't sound like a smart thing to search...")
 		cache.Put(provider, query, []string{"That doesn't sound like a smart thing to search..."})
-		return
+		return true
 	}
 	switch provider {
 		case "youtube":
@@ -156,15 +205,7 @@ func searchHandler(b *discordgo.Session, m *discordgo.MessageCreate, provider st
 		case "urban":
 			search.UrbanDictionarySearch(b, m, query)
 	}
-}
-
-
-func say(b *discordgo.Session, m *discordgo.MessageCreate, what string) {
-	if what == "" {
-		b.ChannelMessageSend(m.ChannelID, "**USAGE:** `" + Constants.COMMAND_PREFIX + "say <what>`")
-		return
-	}
-	b.ChannelMessageSend(m.ChannelID, what)
+	return true
 }
 
 
