@@ -77,8 +77,8 @@ var commands = map[string]CommandInfo {
 		},
 	},
 	"urban": {
-		category:    "Returns the UrbanDictionary definition of the given query",
-		description: "¯\\_(ツ)_/¯",
+		category:    "search",
+		description: "Returns the UrbanDictionary definition of the given query",
 		Execute:     func(b *discordgo.Session, m *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			return search.SearchHandler(b, m, cmd, query)
 		},
