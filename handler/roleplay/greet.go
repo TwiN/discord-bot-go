@@ -12,10 +12,10 @@ var greetings = []string{
 	}
 
 
-func Greet(b *discordgo.Session, m *discordgo.MessageCreate) {
+func Greet(bot *discordgo.Session, message *discordgo.MessageCreate) {
 	img := greetings[rand.Intn(len(greetings))]
 	msg := &discordgo.MessageEmbed{}
-	msg.Description = m.Author.Mention() + " has greeted **" + strings.Replace(m.Message.Content, "!greet ", "", -1) + "**"
+	msg.Description = message.Author.Mention() + " has greeted **" + strings.Replace(message.Message.Content, "!greet ", "", -1) + "**"
 	msg.Image = &discordgo.MessageEmbedImage{URL:img}
-	b.ChannelMessageSendEmbed(m.ChannelID, msg)
+	bot.ChannelMessageSendEmbed(message.ChannelID, msg)
 }

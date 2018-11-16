@@ -15,10 +15,10 @@ var hugs = []string{
 	}
 
 
-func Hug(b *discordgo.Session, m *discordgo.MessageCreate) {
+func Hug(bot *discordgo.Session, message *discordgo.MessageCreate) {
 	img := hugs[rand.Intn(len(hugs))]
 	msg := &discordgo.MessageEmbed{}
-	msg.Description = m.Author.Mention() + " has hugged **" + strings.Replace(m.Message.Content, "!hug ", "", -1) + "**"
+	msg.Description = message.Author.Mention() + " has hugged **" + strings.Replace(message.Message.Content, "!hug ", "", -1) + "**"
 	msg.Image = &discordgo.MessageEmbedImage{URL:img}
-	b.ChannelMessageSendEmbed(m.ChannelID, msg)
+	bot.ChannelMessageSendEmbed(message.ChannelID, msg)
 }

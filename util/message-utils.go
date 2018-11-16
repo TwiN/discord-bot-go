@@ -6,17 +6,17 @@ import (
 )
 
 
-func SendErrorMessage(b *discordgo.Session, m *discordgo.MessageCreate, msg string) {
-	sendMessage(b, m, Constants.EMOJI_FAILURE, msg)
+func SendErrorMessage(bot *discordgo.Session, message *discordgo.MessageCreate, msg string) {
+	sendMessage(bot, message, Constants.EMOJI_FAILURE, msg)
 }
 
 
-func SendSuccessMessage(b *discordgo.Session, m *discordgo.MessageCreate, msg string) {
-	sendMessage(b, m, Constants.EMOJI_SUCCESS, msg)
+func SendSuccessMessage(bot *discordgo.Session, message *discordgo.MessageCreate, msg string) {
+	sendMessage(bot, message, Constants.EMOJI_SUCCESS, msg)
 }
 
 
-func sendMessage(b *discordgo.Session, m *discordgo.MessageCreate, emojiId string, msg string) {
-	b.MessageReactionAdd(m.ChannelID, m.ID, emojiId)
-	b.ChannelMessageSend(m.ChannelID, msg)
+func sendMessage(bot *discordgo.Session, message *discordgo.MessageCreate, emojiId string, msg string) {
+	bot.MessageReactionAdd(message.ChannelID, message.ID, emojiId)
+	bot.ChannelMessageSend(message.ChannelID, msg)
 }

@@ -8,26 +8,26 @@ import (
 )
 
 
-func SearchHandler(b *discordgo.Session, m *discordgo.MessageCreate, provider string, query string) bool {
+func SearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate, provider string, query string) bool {
 	if cache.Has(provider, query) {
 		for _, value := range cache.Get(provider, query) {
 			// TODO: find a way to check if the message is an error or not, and util.SendErrorMessage if it is
-			b.ChannelMessageSend(m.ChannelID, "**[cached]** " + value)
+			bot.ChannelMessageSend(message.ChannelID, "**[cached]** " + value)
 		}
 		return true
 	}
 	if goaway.IsProfane(query) {
-		util.SendErrorMessage(b, m, "That doesn't sound like a smart thing to search...")
+		util.SendErrorMessage(bot, message, "That doesn't sound like a smart thing to search...")
 		cache.Put(provider, query, []string{"That doesn't sound like a smart thing to search..."})
 		return true
 	}
 	switch provider {
 	case "youtube":
-		YoutubeSearch(b, m, query)
+		YoutubeSearch(bot, message, query)
 	case "google":
-		GoogleSearch(b, m, query)
+		GoogleSearch(bot, message, query)
 	case "urban":
-		UrbanDictionarySearch(b, m, query)
+		UrbanDictionarySearch(bot, message, query)
 	}
 	return true
 }

@@ -19,10 +19,10 @@ var pats = []string{
 	}
 
 
-func Pat(b *discordgo.Session, m *discordgo.MessageCreate) {
+func Pat(bot *discordgo.Session, message *discordgo.MessageCreate) {
 	img := pats[rand.Intn(len(pats))]
 	msg := &discordgo.MessageEmbed{}
-	msg.Description = m.Author.Mention() + " has patted **" + strings.Replace(m.Message.Content, "!pat ", "", -1) + "**"
+	msg.Description = message.Author.Mention() + " has patted **" + strings.Replace(message.Message.Content, "!pat ", "", -1) + "**"
 	msg.Image = &discordgo.MessageEmbedImage{URL:img}
-	b.ChannelMessageSendEmbed(m.ChannelID, msg)
+	bot.ChannelMessageSendEmbed(message.ChannelID, msg)
 }
