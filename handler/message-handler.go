@@ -130,6 +130,10 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 		if permission.IsBlacklisted(m.Author.ID) {
 			return
 		}
+		if cmd == "help" {
+			help(b, m)
+			return
+		}
 		if !permission.IsAllowed(cmd, m.Author.ID) {
 			util.SendErrorMessage(b, m, "You have insufficient permissions")
 			return
@@ -139,6 +143,20 @@ func MessageHandler(b *discordgo.Session, m *discordgo.MessageCreate) {
 			commandInfo.Execute(b, m, cmd, query, arguments)
 		}
 	}
+}
+
+
+func help(b *discordgo.Session, m *discordgo.MessageCreate) {
+	output := "\n"
+	for commandName, commandInfo := range commands {
+		output += "__**" + Constants.COMMAND_PREFIX + commandName + "**__\n" +
+			"**description:** " + commandInfo.description + "\n" +
+			"**category:** " + commandInfo.category + "\n\n"
+	}
+	msg := &discordgo.MessageEmbed{}
+	msg.Title = "List of commands available"
+	msg.Description = output
+	b.ChannelMessageSendEmbed(m.ChannelID, msg)
 }
 
 
