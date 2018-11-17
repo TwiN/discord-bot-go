@@ -40,9 +40,11 @@ func Save() {
 	if err != nil {
 		log.Fatalln("[config][Save] Unable to open configuration file:", err)
 	}
-	data, err := json.MarshalIndent(Config, "", "  ")
-	if err != nil {
-		log.Fatalln("[config][Save] Unable to save configuration:", err)
-	}
-	configFile.WriteString(string(data))
+	configFile.WriteString(string(ToJson()))
+}
+
+
+func ToJson() string {
+	data, _ := json.MarshalIndent(Config, "", "  ")
+	return string(data)
 }

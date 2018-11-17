@@ -9,6 +9,7 @@ import (
 	"./roleplay"
 	"./search"
 	"./moderation"
+	"../config"
 )
 
 type CommandInfo struct {
@@ -112,6 +113,14 @@ var commands = map[string]CommandInfo {
 				return false
 			}
 			moderation.PermissionHandler(bot, message, arguments[1], arguments[2], arguments[3])
+			return true
+		},
+	},
+	"config": {
+		category:    "misc",
+		description: "Prints the current configuration",
+		Execute:     func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			bot.ChannelMessageSend(message.ChannelID, "```json\n" + config.ToJson() + "\n```")
 			return true
 		},
 	},
