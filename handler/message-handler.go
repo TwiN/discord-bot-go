@@ -135,7 +135,7 @@ func MessageHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
 			return
 		}
 		if !permission.IsAllowed(cmd, message.Author.ID) {
-			util.SendErrorMessage(bot, message, "You have insufficient permissions")
+			util.SendErrorMessage(bot, message, ":warning: You have insufficient permissions")
 			return
 		}
 		commandInfo, isKeyPresent := commands[cmd]
