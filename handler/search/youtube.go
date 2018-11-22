@@ -10,9 +10,9 @@ import (
 	"../../cache"
 )
 
+
 func YoutubeSearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
 	const COMMAND = Constants.COMMAND_PREFIX + "youtube"
-
 	if len(query) == 0 {
 		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+COMMAND+" <search terms>`")
 	} else {
@@ -26,6 +26,7 @@ func YoutubeSearch(bot *discordgo.Session, message *discordgo.MessageCreate, que
 	}
 }
 
+
 func youtubeSearchScraper(searchTerm string) []string {
 	res, err := fetchYoutubeSearchPage(buildYoutubeSearchUrl(searchTerm))
 	if err != nil {
@@ -34,9 +35,11 @@ func youtubeSearchScraper(searchTerm string) []string {
 	return parseYoutubeSearchResult(res)
 }
 
+
 func buildYoutubeSearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.youtube.com/results?search_query=%s", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
+
 
 func fetchYoutubeSearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -48,6 +51,7 @@ func fetchYoutubeSearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
+
 
 func parseYoutubeSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)

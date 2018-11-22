@@ -10,6 +10,7 @@ import (
 	"../../cache"
 )
 
+
 func GoogleSearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
 	const COMMAND = Constants.COMMAND_PREFIX + "google"
 
@@ -26,6 +27,7 @@ func GoogleSearch(bot *discordgo.Session, message *discordgo.MessageCreate, quer
 	}
 }
 
+
 func googleSearchScraper(searchTerm string) []string {
 	res, err := fetchGoogleSearchPage(buildGoogleSearchUrl(searchTerm))
 	if err != nil {
@@ -34,9 +36,11 @@ func googleSearchScraper(searchTerm string) []string {
 	return parseGoogleSearchResult(res)
 }
 
+
 func buildGoogleSearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.google.com/search?q=%s&num=5&hl=en&safe=active", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
+
 
 func fetchGoogleSearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -48,6 +52,7 @@ func fetchGoogleSearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
+
 
 func parseGoogleSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)

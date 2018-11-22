@@ -10,6 +10,7 @@ import (
 	"../../cache"
 )
 
+
 func UrbanDictionarySearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
 	const COMMAND = Constants.COMMAND_PREFIX + "urban"
 
@@ -24,14 +25,17 @@ func UrbanDictionarySearch(bot *discordgo.Session, message *discordgo.MessageCre
 	}
 }
 
+
 func urbanDictionarySearchScraper(searchTerm string) string {
 	res, _ := fetchUrbanDictionarySearchPage(buildUrbanDictionarySearchUrl(searchTerm))
 	return parseUrbanDictionarySearchResult(res)
 }
 
+
 func buildUrbanDictionarySearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.urbandictionary.com/define.php?term=%s", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
+
 
 func fetchUrbanDictionarySearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -43,6 +47,7 @@ func fetchUrbanDictionarySearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
+
 
 func parseUrbanDictionarySearchResult(response *http.Response) string {
 	doc, _ := goquery.NewDocumentFromReader(response.Body)

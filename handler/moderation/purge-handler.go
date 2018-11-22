@@ -7,6 +7,7 @@ import (
 	"../../util"
 )
 
+
 func Purge(bot *discordgo.Session, message *discordgo.MessageCreate, param string)  {
 	num, err := strconv.Atoi(param)
 	if err != nil {

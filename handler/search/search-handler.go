@@ -22,12 +22,9 @@ func SearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate, pro
 		return true
 	}
 	switch provider {
-	case "youtube":
-		YoutubeSearch(bot, message, query)
-	case "google":
-		GoogleSearch(bot, message, query)
-	case "urban":
-		UrbanDictionarySearch(bot, message, query)
+		case "youtube": YoutubeSearch(bot, message, query)
+		case "google": GoogleSearch(bot, message, query)
+		case "urban": UrbanDictionarySearch(bot, message, query)
 	}
 	return true
 }
