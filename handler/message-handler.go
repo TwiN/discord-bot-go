@@ -185,6 +185,7 @@ func swapAlias(cmd string) string {
 	switch cmd {
 		case "g": return "google"
 		case "yt": return "youtube"
+		case "av": return "avatar"
 	}
 	return cmd
 }

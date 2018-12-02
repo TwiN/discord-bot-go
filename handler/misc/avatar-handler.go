@@ -20,5 +20,3 @@ func AvatarHandler(bot *discordgo.Session, message *discordgo.MessageCreate, que
 	bot.ChannelMessageSend(message.ChannelID, avatar)
 	return true
 }
-
-
