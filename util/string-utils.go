@@ -2,6 +2,7 @@ package util
 
 import "strings"
 
+
 func PadRight(s string, expectedLength int, pad string) string {
 	for {
 		s += pad
@@ -13,7 +14,7 @@ func PadRight(s string, expectedLength int, pad string) string {
 
 
 func MentionToUserId(s string) string {
-	println(s)
+	s = strings.Trim(s, " ")
 	if strings.HasPrefix(s, "<@!") && strings.HasSuffix(s, ">") {
 		return s[3:len(s)-1]
 	} else if strings.HasPrefix(s, "<@") && strings.HasSuffix(s, ">") {

@@ -9,6 +9,7 @@ import (
 	"./roleplay"
 	"./search"
 	"./moderation"
+	"./misc"
 	"../config"
 )
 
@@ -132,17 +133,7 @@ var commands = map[string]CommandInfo {
 				util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "avatar [@user]`")
 				return false
 			}
-			var avatar = message.Author.AvatarURL("512")
-			if len(arguments) == 2 {
-				user, err := bot.User(util.MentionToUserId(query))
-				if err != nil {
-					util.SendErrorMessage(bot, message, "**ERROR:** Invalid username")
-					return false
-				}
-				avatar = user.AvatarURL("512")
-			}
-			bot.ChannelMessageSend(message.ChannelID, avatar)
-			return true
+			return misc.AvatarHandler(bot, message, query)
 		},
 	},
 }
@@ -154,7 +145,7 @@ func MessageHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 	if strings.HasPrefix(message.Content, Constants.COMMAND_PREFIX) {
 		arguments := strings.Split(strings.Trim(strings.Replace(message.Content, Constants.COMMAND_PREFIX, "", 1), " "), " ")
-		query := strings.Replace(message.Content, Constants.COMMAND_PREFIX + arguments[0] + " ", "", 1)
+		query := strings.Trim(strings.Replace(message.Content, Constants.COMMAND_PREFIX + arguments[0], "", 1), " ")
 		cmd := swapAlias(strings.ToLower(arguments[0]))
 
 		if permission.IsBlacklisted(message.Author.ID) {
