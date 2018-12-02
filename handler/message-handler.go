@@ -97,10 +97,10 @@ var commands = map[string]CommandInfo {
 		description: "Manages blacklisted users",
 		Execute:     func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			if len(arguments) != 3 {
-				util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <userId>`")
+				util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "blacklist <add|remove> <@user>`")
 				return false
 			}
-			moderation.BlacklistHandler(bot, message, arguments[1], arguments[2])
+			moderation.BlacklistHandler(bot, message, arguments[1], util.MentionToUserId(arguments[2]))
 			return true
 		},
 	},
@@ -109,10 +109,10 @@ var commands = map[string]CommandInfo {
 		description: "Manages permissions",
 		Execute:     func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			if len(arguments) != 4 {
-				util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "perms <add|remove> <cmd> <userId>`")
+				util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "perms <add|remove> <cmd> <@user>`")
 				return false
 			}
-			moderation.PermissionHandler(bot, message, arguments[1], arguments[2], arguments[3])
+			moderation.PermissionHandler(bot, message, arguments[1], arguments[2], util.MentionToUserId(arguments[3]))
 			return true
 		},
 	},
@@ -121,6 +121,27 @@ var commands = map[string]CommandInfo {
 		description: "Prints the current configuration",
 		Execute:     func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
 			bot.ChannelMessageSend(message.ChannelID, "```json\n" + config.ToJson() + "\n```")
+			return true
+		},
+	},
+	"avatar": {
+		category:    "misc",
+		description: "Prints the avatar of a user",
+		Execute:     func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
+			if len(arguments) > 2 {
+				util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "avatar [@user]`")
+				return false
+			}
+			var avatar = message.Author.AvatarURL("512")
+			if len(arguments) == 2 {
+				user, err := bot.User(util.MentionToUserId(query))
+				if err != nil {
+					util.SendErrorMessage(bot, message, "**ERROR:** Invalid username")
+					return false
+				}
+				avatar = user.AvatarURL("512")
+			}
+			bot.ChannelMessageSend(message.ChannelID, avatar)
 			return true
 		},
 	},
