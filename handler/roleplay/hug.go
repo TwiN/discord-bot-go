@@ -2,8 +2,8 @@ package roleplay
 
 import (
 	"math/rand"
-	"github.com/bwmarrin/discordgo"
 	"strings"
+	"github.com/bwmarrin/discordgo"
 )
 
 var hugs = []string{

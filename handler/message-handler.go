@@ -6,11 +6,11 @@ import (
 	Constants "../global"
 	"../permission"
 	"../util"
+	"../config"
 	"./roleplay"
 	"./search"
 	"./moderation"
 	"./misc"
-	"../config"
 )
 
 type CommandInfo struct {
