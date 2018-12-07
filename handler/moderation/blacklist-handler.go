@@ -1,8 +1,8 @@
 package moderation
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"strings"
+	"github.com/bwmarrin/discordgo"
 	"../../util"
 	"../../permission"
 )

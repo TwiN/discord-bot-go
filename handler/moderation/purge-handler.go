@@ -1,8 +1,8 @@
 package moderation
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"strconv"
+	"github.com/bwmarrin/discordgo"
 	Constants "../../global"
 	"../../util"
 )
