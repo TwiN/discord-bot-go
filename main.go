@@ -1,23 +1,22 @@
 package main
 
 import (
+	"github.com/TwinProduction/discord-bot-go/config"
+	"github.com/TwinProduction/discord-bot-go/handler"
+	"github.com/TwinProduction/discord-bot-go/util"
+	"github.com/bwmarrin/discordgo"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
-	"syscall"
 	"reflect"
 	"runtime"
+	"syscall"
 	"time"
-	"math/rand"
-	"github.com/bwmarrin/discordgo"
-	Handler "./handler"
-	"./util"
-	"./config"
 )
 
 var TOKEN = os.Getenv("SECRETS_DISCORD_BOT_TOKEN")
 var registeredHandlers []interface{}
-
 
 func main() {
 	var bot = connect()
@@ -30,7 +29,6 @@ func main() {
 
 	bot.Close()
 }
-
 
 func connect() *discordgo.Session {
 	var bot, err = discordgo.New("Bot " + TOKEN)
@@ -52,16 +50,14 @@ func connect() *discordgo.Session {
 	return bot
 }
 
-
 func init() {
-	registeredHandlers = append(registeredHandlers, 
-		Handler.MessageHandler,
+	registeredHandlers = append(registeredHandlers,
+		handler.MessageHandler,
 		loggerHandler,
 	)
 	config.Load()
 	rand.Seed(time.Now().Unix())
 }
-
 
 func registerHandlers(bot *discordgo.Session) {
 	bot.UpdateStatus(1, "Registering handlers")
@@ -72,9 +68,8 @@ func registerHandlers(bot *discordgo.Session) {
 	bot.UpdateStatus(0, "")
 }
 
-
 func loggerHandler(bot *discordgo.Session, message *discordgo.MessageCreate) {
 	guild := util.GetGuildNameById(bot, message.GuildID)
 	channel := util.GetChannelNameById(bot, message.ChannelID)
-	log.Println("[" + guild + "#" + channel + "]", message.Author.Username, "-", message.ContentWithMentionsReplaced())
+	log.Println("["+guild+"#"+channel+"]", message.Author.Username, "-", message.ContentWithMentionsReplaced())
 }

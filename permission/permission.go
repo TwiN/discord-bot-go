@@ -1,31 +1,32 @@
 package permission
 
 import (
+	"github.com/TwinProduction/discord-bot-go/config"
+	"github.com/TwinProduction/discord-bot-go/global"
 	"strings"
-	"../config"
-	Constants "../global"
 )
-
 
 func IsAllowed(action string, userId string) bool {
 	if userId == config.Config.Users.OwnerId || isInListOrListContainsAsterisk(config.Config.Users.Admins, userId) {
 		return true
 	}
-	switch strings.Replace(strings.ToLower(action), Constants.COMMAND_PREFIX, "", -1) {
-		case "blacklist": fallthrough
-		case "unblacklist": fallthrough
-		case "perms add": fallthrough
-		case "perms remove": // This is handled by the if at the start of the function... TODO: remove
-			return config.Config.Users.OwnerId == userId || isInListOrListContainsAsterisk(config.Config.Users.Admins, userId)
-		default:
-			if config.Config.Users.Permissions[action] == nil { // new action, add it to the list
-				config.Config.Users.Permissions[action] = []string{}
-				return false
-			}
-			return isInListOrListContainsAsterisk(config.Config.Users.Permissions[action], userId)
+	switch strings.Replace(strings.ToLower(action), global.CommandPrefix, "", -1) {
+	case "blacklist":
+		fallthrough
+	case "unblacklist":
+		fallthrough
+	case "perms add":
+		fallthrough
+	case "perms remove": // This is handled by the if at the start of the function... TODO: remove
+		return config.Config.Users.OwnerId == userId || isInListOrListContainsAsterisk(config.Config.Users.Admins, userId)
+	default:
+		if config.Config.Users.Permissions[action] == nil { // new action, add it to the list
+			config.Config.Users.Permissions[action] = []string{}
+			return false
+		}
+		return isInListOrListContainsAsterisk(config.Config.Users.Permissions[action], userId)
 	}
 }
-
 
 func Blacklist(userId string) bool {
 	if config.Config.Users.BlackList == nil {
@@ -39,7 +40,6 @@ func Blacklist(userId string) bool {
 	}
 	return false
 }
-
 
 func Unblacklist(userId string) bool {
 	if config.Config.Users.BlackList == nil {
@@ -56,7 +56,6 @@ func Unblacklist(userId string) bool {
 	return false
 }
 
-
 func IsBlacklisted(userId string) bool {
 	if config.Config.Users.BlackList == nil {
 		config.Config.Users.BlackList = []string{}
@@ -64,7 +63,6 @@ func IsBlacklisted(userId string) bool {
 	}
 	return isInListOrListContainsAsterisk(config.Config.Users.BlackList, userId)
 }
-
 
 func AddPermission(action string, userId string) bool {
 	if config.Config.Users.Permissions == nil {
@@ -77,7 +75,6 @@ func AddPermission(action string, userId string) bool {
 	}
 	return false
 }
-
 
 func RemovePermission(action string, userId string) bool {
 	if config.Config.Users.Permissions == nil {
@@ -92,7 +89,6 @@ func RemovePermission(action string, userId string) bool {
 	}
 	return false
 }
-
 
 func isInListOrListContainsAsterisk(haystack []string, needle string) bool {
 	for _, element := range haystack {

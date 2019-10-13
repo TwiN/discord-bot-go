@@ -1,21 +1,20 @@
 package search
 
 import (
-	"strings"
-	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/TwinProduction/discord-bot-go/cache"
+	"github.com/TwinProduction/discord-bot-go/global"
+	"github.com/bwmarrin/discordgo"
 	"net/http"
-	Constants "../../global"
-	"../../cache"
+	"strings"
 )
 
-
 func GoogleSearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
-	const COMMAND = Constants.COMMAND_PREFIX + "google"
+	const Command = global.CommandPrefix + "google"
 
 	if len(query) == 0 {
-		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+COMMAND+" <search terms>`")
+		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+Command+" <search terms>`")
 	} else {
 		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on Google")
 		var results = googleSearchScraper(query)
@@ -27,7 +26,6 @@ func GoogleSearch(bot *discordgo.Session, message *discordgo.MessageCreate, quer
 	}
 }
 
-
 func googleSearchScraper(searchTerm string) []string {
 	res, err := fetchGoogleSearchPage(buildGoogleSearchUrl(searchTerm))
 	if err != nil {
@@ -36,11 +34,9 @@ func googleSearchScraper(searchTerm string) []string {
 	return parseGoogleSearchResult(res)
 }
 
-
 func buildGoogleSearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.google.com/search?q=%s&num=5&hl=en&safe=active", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
-
 
 func fetchGoogleSearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -52,7 +48,6 @@ func fetchGoogleSearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
-
 
 func parseGoogleSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)

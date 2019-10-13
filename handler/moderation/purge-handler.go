@@ -1,17 +1,16 @@
 package moderation
 
 import (
-	"strconv"
+	"github.com/TwinProduction/discord-bot-go/global"
+	"github.com/TwinProduction/discord-bot-go/util"
 	"github.com/bwmarrin/discordgo"
-	Constants "../../global"
-	"../../util"
+	"strconv"
 )
 
-
-func Purge(bot *discordgo.Session, message *discordgo.MessageCreate, param string)  {
+func Purge(bot *discordgo.Session, message *discordgo.MessageCreate, param string) {
 	num, err := strconv.Atoi(param)
 	if err != nil {
-		util.SendErrorMessage(bot, message, "**USAGE:** `" + Constants.COMMAND_PREFIX + "purge <number of messages>`")
+		util.SendErrorMessage(bot, message, "**USAGE:** `"+global.CommandPrefix+"purge <number of messages>`")
 		return
 	}
 	// TODO: Check if user is allowed to purge on the channel
@@ -25,5 +24,5 @@ func Purge(bot *discordgo.Session, message *discordgo.MessageCreate, param strin
 		messagesToPurge = append(messagesToPurge, msg.ID)
 	}
 	bot.ChannelMessagesBulkDelete(message.ChannelID, messagesToPurge) // 1 call is better than N calls
-	bot.MessageReactionAdd(message.ChannelID, message.ID, Constants.EMOJI_SUCCESS)
+	bot.MessageReactionAdd(message.ChannelID, message.ID, Constants.EmojiSuccess)
 }

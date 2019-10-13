@@ -1,21 +1,20 @@
 package search
 
 import (
-	"strings"
-	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/TwinProduction/discord-bot-go/cache"
+	"github.com/TwinProduction/discord-bot-go/global"
+	"github.com/bwmarrin/discordgo"
 	"net/http"
-	Constants "../../global"
-	"../../cache"
+	"strings"
 )
 
-
 func UrbanDictionarySearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
-	const COMMAND = Constants.COMMAND_PREFIX + "urban"
+	const Command = global.CommandPrefix + "urban"
 
 	if len(query) == 0 {
-		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+COMMAND+" <search terms>`")
+		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+Command+" <search terms>`")
 	} else {
 		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on UrbanDictionary")
 		result := "**Urban Dictionary search result for `" + query + "`:**" + urbanDictionarySearchScraper(query)
@@ -25,17 +24,14 @@ func UrbanDictionarySearch(bot *discordgo.Session, message *discordgo.MessageCre
 	}
 }
 
-
 func urbanDictionarySearchScraper(searchTerm string) string {
 	res, _ := fetchUrbanDictionarySearchPage(buildUrbanDictionarySearchUrl(searchTerm))
 	return parseUrbanDictionarySearchResult(res)
 }
 
-
 func buildUrbanDictionarySearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.urbandictionary.com/define.php?term=%s", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
-
 
 func fetchUrbanDictionarySearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -47,7 +43,6 @@ func fetchUrbanDictionarySearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
-
 
 func parseUrbanDictionarySearchResult(response *http.Response) string {
 	doc, _ := goquery.NewDocumentFromReader(response.Body)

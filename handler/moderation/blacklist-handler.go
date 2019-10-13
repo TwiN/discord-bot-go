@@ -1,12 +1,11 @@
 package moderation
 
 import (
-	"strings"
+	"github.com/TwinProduction/discord-bot-go/permission"
+	"github.com/TwinProduction/discord-bot-go/util"
 	"github.com/bwmarrin/discordgo"
-	"../../util"
-	"../../permission"
+	"strings"
 )
-
 
 func BlacklistHandler(bot *discordgo.Session, message *discordgo.MessageCreate, action string, userId string) {
 	var target string
@@ -21,19 +20,19 @@ func BlacklistHandler(bot *discordgo.Session, message *discordgo.MessageCreate, 
 		target = "All users"
 	}
 	switch strings.ToLower(action) {
-		case "add":
-			if permission.Blacklist(userId) {
-				util.SendSuccessMessage(bot, message, target + " has been added to the blacklist")
-			} else {
-				util.SendErrorMessage(bot, message, ":warning: Couldn't add that user to the blacklist!")
-			}
-		case "remove":
-			if permission.Unblacklist(userId) {
-				util.SendSuccessMessage(bot, message, target + " has been removed from the blacklist")
-			} else {
-				util.SendErrorMessage(bot, message, ":warning: There is no user with that id in the blacklist")
-			}
-		default:
-			util.SendErrorMessage(bot, message, ":warning: Invalid action.")
+	case "add":
+		if permission.Blacklist(userId) {
+			util.SendSuccessMessage(bot, message, target+" has been added to the blacklist")
+		} else {
+			util.SendErrorMessage(bot, message, ":warning: Couldn't add that user to the blacklist!")
+		}
+	case "remove":
+		if permission.Unblacklist(userId) {
+			util.SendSuccessMessage(bot, message, target+" has been removed from the blacklist")
+		} else {
+			util.SendErrorMessage(bot, message, ":warning: There is no user with that id in the blacklist")
+		}
+	default:
+		util.SendErrorMessage(bot, message, ":warning: Invalid action.")
 	}
 }

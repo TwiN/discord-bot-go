@@ -1,9 +1,9 @@
 package roleplay
 
 import (
+	"github.com/bwmarrin/discordgo"
 	"math/rand"
 	"strings"
-	"github.com/bwmarrin/discordgo"
 )
 
 var pats = []string{
@@ -16,13 +16,12 @@ var pats = []string{
 	"https://media1.tenor.com/images/c0bcaeaa785a6bdf1fae82ecac65d0cc/tenor.gif?itemid=7453915",
 	"http://i.imgur.com/laEy6LU.gif",
 	"https://archive-media-0.nyafuu.org/c/image/1483/55/1483553008493.gif",
-	}
-
+}
 
 func Pat(bot *discordgo.Session, message *discordgo.MessageCreate) {
 	img := pats[rand.Intn(len(pats))]
 	msg := &discordgo.MessageEmbed{}
 	msg.Description = message.Author.Mention() + " has patted **" + strings.Replace(message.Message.Content, "!pat ", "", -1) + "**"
-	msg.Image = &discordgo.MessageEmbedImage{URL:img}
+	msg.Image = &discordgo.MessageEmbedImage{URL: img}
 	bot.ChannelMessageSendEmbed(message.ChannelID, msg)
 }

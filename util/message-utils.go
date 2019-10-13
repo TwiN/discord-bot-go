@@ -1,20 +1,17 @@
 package util
 
 import (
+	"github.com/TwinProduction/discord-bot-go/global"
 	"github.com/bwmarrin/discordgo"
-	Constants "../global"
 )
 
-
 func SendErrorMessage(bot *discordgo.Session, message *discordgo.MessageCreate, msg string) {
-	sendMessage(bot, message, Constants.EMOJI_FAILURE, msg)
+	sendMessage(bot, message, global.EmojiFailure, msg)
 }
-
 
 func SendSuccessMessage(bot *discordgo.Session, message *discordgo.MessageCreate, msg string) {
-	sendMessage(bot, message, Constants.EMOJI_SUCCESS, msg)
+	sendMessage(bot, message, global.EmojiSuccess, msg)
 }
-
 
 func sendMessage(bot *discordgo.Session, message *discordgo.MessageCreate, emojiId string, msg string) {
 	bot.MessageReactionAdd(message.ChannelID, message.ID, emojiId)

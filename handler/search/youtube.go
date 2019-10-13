@@ -1,20 +1,19 @@
 package search
 
 import (
-	"strings"
-	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/TwinProduction/discord-bot-go/cache"
+	"github.com/TwinProduction/discord-bot-go/global"
+	"github.com/bwmarrin/discordgo"
 	"net/http"
-	Constants "../../global"
-	"../../cache"
+	"strings"
 )
 
-
 func YoutubeSearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
-	const COMMAND = Constants.COMMAND_PREFIX + "youtube"
+	const Command = global.CommandPrefix + "youtube"
 	if len(query) == 0 {
-		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+COMMAND+" <search terms>`")
+		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+Command+" <search terms>`")
 	} else {
 		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on Youtube")
 		var results = youtubeSearchScraper(query)
@@ -26,7 +25,6 @@ func YoutubeSearch(bot *discordgo.Session, message *discordgo.MessageCreate, que
 	}
 }
 
-
 func youtubeSearchScraper(searchTerm string) []string {
 	res, err := fetchYoutubeSearchPage(buildYoutubeSearchUrl(searchTerm))
 	if err != nil {
@@ -35,11 +33,9 @@ func youtubeSearchScraper(searchTerm string) []string {
 	return parseYoutubeSearchResult(res)
 }
 
-
 func buildYoutubeSearchUrl(searchTerm string) string {
 	return fmt.Sprintf("https://www.youtube.com/results?search_query=%s", strings.Replace(strings.Trim(searchTerm, " "), " ", "+", -1))
 }
-
 
 func fetchYoutubeSearchPage(url string) (*http.Response, error) {
 	baseClient := &http.Client{}
@@ -51,7 +47,6 @@ func fetchYoutubeSearchPage(url string) (*http.Response, error) {
 	}
 	return res, nil
 }
-
 
 func parseYoutubeSearchResult(response *http.Response) []string {
 	doc, err := goquery.NewDocumentFromReader(response.Body)

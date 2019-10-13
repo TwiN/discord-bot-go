@@ -2,23 +2,22 @@ package config
 
 import (
 	"encoding/json"
-	"os"
 	"log"
+	"os"
 )
 
 type Configuration struct {
-	Users         UsersConfiguration
-	AutoWelcome   bool
+	Users       UsersConfiguration
+	AutoWelcome bool
 }
 type UsersConfiguration struct {
-	OwnerId       string
-	Admins        []string
-	BlackList     []string
-	Permissions   map[string][]string
+	OwnerId     string
+	Admins      []string
+	BlackList   []string
+	Permissions map[string][]string
 }
 
 var Config Configuration
-
 
 func Load() {
 	log.Println("[config][Load] Loading configuration file")
@@ -33,16 +32,14 @@ func Load() {
 	Config = configuration
 }
 
-
 func Save() {
 	configFile, err := os.Create("config.json")
 	defer configFile.Close()
 	if err != nil {
 		log.Fatalln("[config][Save] Unable to open configuration file:", err)
 	}
-	configFile.WriteString(string(ToJson()))
+	configFile.WriteString(ToJson())
 }
-
 
 func ToJson() string {
 	data, _ := json.MarshalIndent(Config, "", "  ")

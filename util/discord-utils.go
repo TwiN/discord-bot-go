@@ -1,10 +1,9 @@
 package util
 
 import (
+	"github.com/TwinProduction/discord-bot-go/cache"
 	"github.com/bwmarrin/discordgo"
-	"../cache"
 )
-
 
 func GetChannelNameById(bot *discordgo.Session, id string) string {
 	if !cache.Has("channel", id) {
@@ -14,7 +13,6 @@ func GetChannelNameById(bot *discordgo.Session, id string) string {
 	}
 	return cache.Get("channel", id)[0]
 }
-
 
 func GetGuildNameById(bot *discordgo.Session, id string) string {
 	if !cache.Has("guild", id) {

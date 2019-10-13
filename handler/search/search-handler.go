@@ -1,18 +1,17 @@
 package search
 
 import (
-	"github.com/bwmarrin/discordgo"
+	"github.com/TwinProduction/discord-bot-go/cache"
+	"github.com/TwinProduction/discord-bot-go/util"
 	"github.com/TwinProduction/go-away"
-	"../../cache"
-	"../../util"
+	"github.com/bwmarrin/discordgo"
 )
-
 
 func SearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate, provider string, query string) bool {
 	if cache.Has(provider, query) {
 		for _, value := range cache.Get(provider, query) {
 			// TODO: find a way to check if the message is an error or not, and util.SendErrorMessage if it is
-			bot.ChannelMessageSend(message.ChannelID, "**[cached]** " + value)
+			bot.ChannelMessageSend(message.ChannelID, "**[cached]** "+value)
 		}
 		return true
 	}
@@ -22,9 +21,12 @@ func SearchHandler(bot *discordgo.Session, message *discordgo.MessageCreate, pro
 		return true
 	}
 	switch provider {
-		case "youtube": YoutubeSearch(bot, message, query)
-		case "google": GoogleSearch(bot, message, query)
-		case "urban": UrbanDictionarySearch(bot, message, query)
+	case "youtube":
+		YoutubeSearch(bot, message, query)
+	case "google":
+		GoogleSearch(bot, message, query)
+	case "urban":
+		UrbanDictionarySearch(bot, message, query)
 	}
 	return true
 }

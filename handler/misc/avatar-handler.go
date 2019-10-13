@@ -2,7 +2,7 @@ package misc
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"../../util"
+	"github.com/TwinProduction/discord-bot-go/util"
 )
 
 
