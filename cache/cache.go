@@ -1,18 +1,21 @@
 package cache
 
-var cache = make(map[string]map[string][]string)
-
-
-func Get(cacheName string, key string) []string {
-	return cache[cacheName][key]
+type Cache struct {
+	cache map[string][]string
 }
 
-
-func Put(cacheName string, key string, value []string) {
-	cache[cacheName][key] = value
+func NewCache() *Cache {
+	return &Cache{cache: make(map[string][]string)}
 }
 
+func (c *Cache) Get(key string) []string {
+	return c.cache[key]
+}
 
-func Has(cacheName string, key string) bool {
-	return cache[cacheName][key] != nil
+func (c *Cache) Put(key string, value []string) {
+	c.cache[key] = value
+}
+
+func (c *Cache) Has(key string) bool {
+	return c.cache[key] != nil
 }

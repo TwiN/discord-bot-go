@@ -6,19 +6,19 @@ import (
 )
 
 func GetChannelNameById(bot *discordgo.Session, id string) string {
-	if !cache.Has("channel", id) {
+	if !cache.Channel.Has(id) {
 		channel, _ := bot.Channel(id)
-		cache.Put("channel", id, []string{channel.Name})
+		cache.Channel.Put(id, []string{channel.Name})
 		return channel.Name
 	}
-	return cache.Get("channel", id)[0]
+	return cache.Channel.Get(id)[0]
 }
 
 func GetGuildNameById(bot *discordgo.Session, id string) string {
-	if !cache.Has("guild", id) {
+	if !cache.Guild.Has(id) {
 		guild, _ := bot.Guild(id)
-		cache.Put("guild", id, []string{guild.Name})
+		cache.Guild.Put(id, []string{guild.Name})
 		return guild.Name
 	}
-	return cache.Get("guild", id)[0]
+	return cache.Guild.Get(id)[0]
 }

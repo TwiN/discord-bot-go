@@ -17,7 +17,7 @@ func YoutubeSearch(bot *discordgo.Session, message *discordgo.MessageCreate, que
 	} else {
 		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on Youtube")
 		var results = youtubeSearchScraper(query)
-		cache.Put("youtube", query, results)
+		cache.Youtube.Put(query, results)
 		for _, url := range results {
 			bot.ChannelMessageSend(message.ChannelID, url)
 		}

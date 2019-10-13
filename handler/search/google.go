@@ -18,7 +18,7 @@ func GoogleSearch(bot *discordgo.Session, message *discordgo.MessageCreate, quer
 	} else {
 		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on Google")
 		var results = googleSearchScraper(query)
-		cache.Put("google", query, results)
+		cache.Google.Put(query, results)
 		for _, url := range results {
 			bot.ChannelMessageSend(message.ChannelID, url)
 		}

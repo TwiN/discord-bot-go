@@ -1,10 +1,9 @@
 package misc
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"github.com/TwinProduction/discord-bot-go/util"
+	"github.com/bwmarrin/discordgo"
 )
-
 
 func AvatarHandler(bot *discordgo.Session, message *discordgo.MessageCreate, query string) bool {
 	userId := util.MentionToUserId(query)

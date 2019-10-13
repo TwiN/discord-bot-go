@@ -18,7 +18,7 @@ func UrbanDictionarySearch(bot *discordgo.Session, message *discordgo.MessageCre
 	} else {
 		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on UrbanDictionary")
 		result := "**Urban Dictionary search result for `" + query + "`:**" + urbanDictionarySearchScraper(query)
-		cache.Put("urban", query, []string{result})
+		cache.Urban.Put(query, []string{result})
 		bot.ChannelMessageSend(message.ChannelID, result)
 		bot.UpdateStatus(0, "")
 	}

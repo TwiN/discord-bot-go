@@ -67,21 +67,21 @@ var commands = map[string]CommandInfo{
 		category:    "search",
 		description: "Returns the top YouTube search results for the given query",
 		Execute: func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
-			return search.SearchHandler(bot, message, cmd, query)
+			return search.Handler(bot, message, cmd, query)
 		},
 	},
 	"google": {
 		category:    "search",
 		description: "Returns the top Google search results for the given query",
 		Execute: func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
-			return search.SearchHandler(bot, message, cmd, query)
+			return search.Handler(bot, message, cmd, query)
 		},
 	},
 	"urban": {
 		category:    "search",
 		description: "Returns the UrbanDictionary definition of the given query",
 		Execute: func(bot *discordgo.Session, message *discordgo.MessageCreate, cmd string, query string, arguments []string) bool {
-			return search.SearchHandler(bot, message, cmd, query)
+			return search.Handler(bot, message, cmd, query)
 		},
 	},
 	"purge": {
