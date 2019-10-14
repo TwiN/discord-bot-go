@@ -1,6 +1,7 @@
 package moderation
 
 import (
+	"fmt"
 	"github.com/TwinProduction/discord-bot-go/permission"
 	"github.com/TwinProduction/discord-bot-go/util"
 	"github.com/bwmarrin/discordgo"
@@ -22,13 +23,13 @@ func PermissionHandler(bot *discordgo.Session, message *discordgo.MessageCreate,
 	switch strings.ToLower(action) {
 	case "add":
 		if permission.AddPermission(cmd, userId) {
-			util.SendSuccessMessage(bot, message, "Permissions for '"+cmd+"' has been granted to "+target)
+			util.SendSuccessMessage(bot, message, fmt.Sprintf("Permissions for '%s' has been granted to %s", cmd, target))
 		} else {
 			util.SendErrorMessage(bot, message, ":warning: User passed as parameter already has access to the given command.")
 		}
 	case "remove":
 		if permission.RemovePermission(cmd, userId) {
-			util.SendSuccessMessage(bot, message, "Permissions for '"+cmd+"' has been removed from "+target)
+			util.SendSuccessMessage(bot, message, fmt.Sprintf("Permissions for '%s' has been removed from %s", cmd, target))
 		} else {
 			util.SendErrorMessage(bot, message, ":warning: User passed as parameter already doesn't have access to the given command.")
 		}

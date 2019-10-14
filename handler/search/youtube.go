@@ -63,7 +63,7 @@ func parseYoutubeSearchResult(response *http.Response) []string {
 		if len(videoId) > 20 {
 			continue
 		}
-		link := "https://www.youtube.com/watch?v=" + videoId
+		link := fmt.Sprintf("https://www.youtube.com/watch?v=%s", videoId)
 		if link != "" && link != "#" && strings.HasPrefix(link, "http") {
 			result := link
 			results = append(results, result)
