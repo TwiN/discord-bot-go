@@ -1,30 +1,13 @@
-package search
+package urban
 
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/TwinProduction/discord-bot-go/cache"
-	"github.com/TwinProduction/discord-bot-go/global"
-	"github.com/bwmarrin/discordgo"
 	"net/http"
 	"strings"
 )
 
-func UrbanDictionarySearch(bot *discordgo.Session, message *discordgo.MessageCreate, query string) {
-	const Command = global.CommandPrefix + "urban"
-
-	if len(query) == 0 {
-		bot.ChannelMessageSend(message.ChannelID, "**USAGE:** `"+Command+" <search terms>`")
-	} else {
-		bot.UpdateStatus(1, "| :mag_right: '"+query+"' on UrbanDictionary")
-		result := "**Urban Dictionary search result for `" + query + "`:**" + urbanDictionarySearchScraper(query)
-		cache.Urban.Put(query, []string{result})
-		bot.ChannelMessageSend(message.ChannelID, result)
-		bot.UpdateStatus(0, "")
-	}
-}
-
-func urbanDictionarySearchScraper(searchTerm string) string {
+func Scrape(searchTerm string) string {
 	res, _ := fetchUrbanDictionarySearchPage(buildUrbanDictionarySearchUrl(searchTerm))
 	return parseUrbanDictionarySearchResult(res)
 }
